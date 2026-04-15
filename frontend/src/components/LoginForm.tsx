@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { Box, Button, TextField, Typography, Paper, Alert, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useAuthContext } from '../App';
@@ -32,94 +32,89 @@ export default function LoginForm() {
       });
       navigate('/dashboard');
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Error de autenticación. Por favor, verifique sus credenciales.');
-      }
+      setError(err instanceof Error ? err.message : 'Error de autenticación. Verifique sus credenciales.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
-        padding: 2,
-      }}
-    >
-      <Paper
-        elevation={3}
-        sx={{
-          padding: 4,
-          maxWidth: 400,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <Typography variant="h5" component="h1" gutterBottom align="center">
-          Merma Optimization
-        </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" gutterBottom>
-          Inicie sesión para acceder al sistema
-        </Typography>
+    <div className="login-page">
+      <div className="login-card">
+        {/* Logo / Brand */}
+        <div className="login-logo">
+          <div className="login-logo-icon">🌿</div>
+          <h1 style={{
+            fontSize: 'var(--text-2xl)',
+            fontWeight: 700,
+            color: 'var(--clr-text-1)',
+            marginBottom: '4px',
+          }}>
+            Merma Optimization
+          </h1>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--clr-text-2)' }}>
+            Inicie sesión para acceder al sistema
+          </p>
+        </div>
 
+        {/* Error banner */}
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
+          <div className="alert-strip alert-strip--error" style={{ marginBottom: 'var(--sp-4)' }}>
+            <span>⚠</span> {error}
+          </div>
         )}
 
+        {/* Form */}
         <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Usuario"
-            variant="outlined"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            margin="normal"
-            disabled={loading}
-            autoComplete="username"
-            autoFocus
-          />
-          <TextField
-            fullWidth
-            label="Contraseña"
-            type="password"
-            variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            disabled={loading}
-            autoComplete="current-password"
-          />
-          <Button
+          <div className="field-group">
+            <label className="field-label" htmlFor="username">Usuario</label>
+            <input
+              id="username"
+              className="field-input"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Ingrese su usuario"
+              disabled={loading}
+              autoComplete="username"
+              autoFocus
+            />
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              className="field-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              disabled={loading}
+              autoComplete="current-password"
+            />
+          </div>
+
+          <button
             type="submit"
-            fullWidth
-            variant="contained"
-            size="large"
+            className="login-submit"
             disabled={loading}
-            sx={{
-              mt: 3,
-              mb: 2,
-              py: 1.5,
-              backgroundColor: '#1976d2',
-              '&:hover': {
-                backgroundColor: '#1565c0',
-              },
-            }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar Sesión'}
-          </Button>
+            {loading
+              ? <CircularProgress size={20} color="inherit" style={{ verticalAlign: 'middle' }} />
+              : 'Iniciar Sesión'}
+          </button>
         </form>
-      </Paper>
-    </Box>
+
+        <p style={{
+          marginTop: 'var(--sp-5)',
+          textAlign: 'center',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--clr-text-3)',
+        }}>
+          Sistema de gestión de merma · v1.0
+        </p>
+      </div>
+    </div>
   );
 }

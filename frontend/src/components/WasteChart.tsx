@@ -10,7 +10,9 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  type TooltipProps,
 } from 'recharts';
+import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { Card, CardContent, CardHeader, Typography, Box, CircularProgress, Alert, useTheme } from '@mui/material';
 import { WasteMetric } from '../types';
 
@@ -73,7 +75,7 @@ const WasteChart: React.FC<WasteChartProps> = ({
     return value.toFixed(2);
   };
 
-  const customizeTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string; color: string }>; label?: string }) => {
+  const customizeTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (!active || !payload || payload.length === 0) {
       return null;
     }
@@ -96,10 +98,10 @@ const WasteChart: React.FC<WasteChartProps> = ({
           <Typography
             key={index}
             variant="body2"
-            sx={{ color: entry.color, display: 'block' }}
+            sx={{ color: entry.color as string, display: 'block' }}
           >
             {entry.name === 'waste_quantity' ? 'Quantity: ' : 'Cost: '}
-            {formatTooltipValue(entry.value, entry.name)}
+            {entry.value != null ? formatTooltipValue(Number(entry.value), String(entry.name)) : '-'}
           </Typography>
         ))}
       </Box>

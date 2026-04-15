@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { DemandPredictionParams, DemandPredictionResponse, demandApi } from '../api/demand';
+import { DemandPredictionParams, demandApi } from '../api/demand';
+import type { DemandPredictionResponse } from '../types';
 
 export function useDemand() {
   const [prediction, setPrediction] = useState<DemandPredictionResponse | null>(null);
