@@ -110,6 +110,10 @@ class Settings(BaseSettings):
         default=True,
         description="Decode Redis responses to Python types"
     )
+    CACHE_DEFAULT_TTL: int = Field(
+        default=300,
+        description="Default cache TTL in seconds"
+    )
     
     @property
     def REDIS_URL(self) -> str:

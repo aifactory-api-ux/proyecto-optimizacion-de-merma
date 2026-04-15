@@ -12,14 +12,12 @@ from sqlalchemy import create_engine, pool
 from sqlalchemy.orm import (
     Session,
     sessionmaker,
-    SessionLocal as SQLAlchemySessionLocal,
 )
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncSession,
     async_sessionmaker,
     AsyncEngine,
-    AsyncSessionLocal,
 )
 
 from app.core.config import settings
@@ -140,7 +138,7 @@ class DatabaseManager:
         """Create a new synchronous database session."""
         return self.sync_session_factory()
     
-    def get_async_session(self) -> AsyncGenerator[AsyncSession, None]:
+    async def get_async_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Create a new asynchronous database session."""
         async with self.async_session_factory() as session:
             yield session
@@ -222,8 +220,8 @@ class SessionLocal:
         return db_manager.get_sync_session()
 
 
-# Legacy compatibility: Session database session factory
-Session: sessionmaker = db_manager.sync_session_factory
+# Legacy compatibility: synchronous session factory alias
+SyncSessionFactory: sessionmaker = db_manager.sync_session_factory
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -256,6 +254,26 @@ async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
         finally:
             await session.close()
+
+
+async def init_db() -> None:
+    """
+    Async initialization of database tables.
+
+    Called on application startup via the lifespan context manager.
+    """
+    async with db_manager.async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def close_db() -> None:
+    """
+    Async cleanup of database connections.
+
+    Called on application shutdown via the lifespan context manager.
+    """
+    await db_manager.async_engine.dispose()
+    db_manager.dispose()
 
 
 def init_database() -> None:
