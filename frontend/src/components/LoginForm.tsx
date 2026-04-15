@@ -2,14 +2,11 @@ import React, { useState, FormEvent } from 'react';
 import { Box, Button, TextField, Typography, Paper, Alert, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
-import { UserLoginRequest } from '../types';
+import { useAuthContext } from '../App';
 
-interface LoginFormProps {
-  onLoginSuccess?: () => void;
-}
-
-export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
+export default function LoginForm() {
   const navigate = useNavigate();
+  const { login: authLogin } = useAuthContext();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,21 +24,13 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     }
 
     try {
-      const credentials: UserLoginRequest = {
+      const response = await login({ username: username.trim(), password });
+      authLogin(response.access_token, {
+        id: 0,
         username: username.trim(),
-        password: password,
-      };
-
-      const response = await login(credentials);
-      
-      localStorage.setItem('access_token', response.access_token);
-      localStorage.setItem('token_type', response.token_type);
-
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      } else {
-        navigate('/dashboard');
-      }
+        is_admin: false,
+      });
+      navigate('/dashboard');
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

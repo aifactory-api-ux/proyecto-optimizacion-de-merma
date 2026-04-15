@@ -1,18 +1,16 @@
 import apiClient from './index';
-import type { WasteByProductResponse, WasteTrendResponse } from '../types';
+import type { WasteMetric, WasteByProductResponse, WasteTrendResponse, WasteQueryParams } from '../types';
 
-export async function getWasteByProduct(token: string, startDate: string, endDate: string): Promise<WasteByProductResponse[]> {
+export async function getWasteByProduct(params: WasteQueryParams): Promise<WasteByProductResponse[]> {
   const response = await apiClient.get<WasteByProductResponse[]>('/waste/by-product', {
-    params: { start_date: startDate, end_date: endDate },
-    headers: { Authorization: `Bearer ${token}` },
+    params: { start_date: params.startDate, end_date: params.endDate, product_id: params.product_id },
   });
   return response.data;
 }
 
-export async function getWasteTrend(token: string, startDate: string, endDate: string): Promise<WasteTrendResponse[]> {
+export async function getWasteTrend(params: WasteQueryParams): Promise<WasteTrendResponse[]> {
   const response = await apiClient.get<WasteTrendResponse[]>('/waste/trend', {
-    params: { start_date: startDate, end_date: endDate },
-    headers: { Authorization: `Bearer ${token}` },
+    params: { start_date: params.startDate, end_date: params.endDate, product_id: params.product_id },
   });
   return response.data;
 }
@@ -22,4 +20,4 @@ export const wasteAPI = {
   getWasteTrend,
 };
 
-export type { WasteByProductResponse, WasteTrendResponse };
+export type { WasteByProductResponse, WasteTrendResponse, WasteQueryParams, WasteMetric };

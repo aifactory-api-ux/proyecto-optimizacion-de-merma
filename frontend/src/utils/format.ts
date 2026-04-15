@@ -38,6 +38,13 @@ export function formatQuantity(quantity: number, decimals: number = 2): string {
   });
 }
 
+export function formatNumber(value: number, decimals: number = 2): string {
+  return value.toLocaleString('es-MX', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
 export function calculatePercentage(part: number, total: number, decimals: number = 2): string {
   if (!total || total === 0) return '0%';
   const percent = (part / total) * 100;

@@ -35,9 +35,10 @@ import DemandPredictionCard from './DemandPredictionCard';
 
 interface DashboardProps {
   onLogout?: () => void;
+  user?: { id: number; username: string; is_admin: boolean } | null;
 }
 
-export default function Dashboard({ onLogout }: DashboardProps) {
+export default function Dashboard({ onLogout, user }: DashboardProps) {
   const [selectedDateRange, setSelectedDateRange] = useState<{ start: Date; end: Date }>({
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     end: new Date(),

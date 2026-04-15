@@ -8,7 +8,7 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // API base URL from environment variable - must be provided at build time
-const API_BASE_URL = import.meta.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 /**
  * Create axios instance with default configuration
@@ -58,7 +58,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Clear invalid token
       localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('auth_user_data');
       
       // Only redirect if not already on login page
       if (!window.location.pathname.includes('/login')) {

@@ -6,7 +6,7 @@
  */
 
 import { api } from "./index";
-import type { DemandPredictionResponse, DemandPredictionRequest } from "../types";
+import type { DemandPredictionResponse } from "../types";
 
 /**
  * Request parameters for getting demand predictions
@@ -64,7 +64,7 @@ export interface GetBatchDemandPredictionsParams {
 export async function getBatchDemandPredictions(
   params: GetBatchDemandPredictionsParams
 ): Promise<DemandPredictionResponse[]> {
-  const { product_ids, startDate, endDate } = params;
+  const { product_ids, startDate } = params;
   
   const predictions: DemandPredictionResponse[] = [];
   

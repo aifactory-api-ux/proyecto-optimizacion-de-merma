@@ -63,6 +63,39 @@ export interface Alert {
   severity: AlertSeverity;
 }
 
+// ==================== Waste Query Types ====================
+
+/**
+ * Query parameters for waste API calls
+ */
+export interface WasteQueryParams {
+  startDate: string;
+  endDate: string;
+  product_id?: number;
+}
+
+/**
+ * Waste aggregated by product response
+ */
+export interface WasteByProductResponse {
+  product_id: number;
+  product_name: string;
+  waste_quantity: number;
+  waste_cost: number;
+  date: string;
+}
+
+/**
+ * Waste trend data point
+ */
+export interface WasteTrendResponse {
+  date: string;
+  waste_quantity: number;
+  waste_cost: number;
+  product_id?: number;
+  product_name?: string;
+}
+
 // ==================== Demand Prediction Types ====================
 
 /**
@@ -188,25 +221,3 @@ export interface DemandState {
   error: string | null;
 }
 
-// ==================== Re-export all types ====================
-
-export type {
-  UserLoginRequest,
-  UserLoginResponse,
-  WasteMetric,
-  DashboardMetricsResponse,
-  Alert,
-  AlertSeverity,
-  DemandPredictionResponse,
-  ApiError,
-  ValidationError,
-  PaginatedResponse,
-  DateRangeParams,
-  ProductDateRangeParams,
-  AuthState,
-  UserInfo,
-  DashboardState,
-  AlertsState,
-  WasteState,
-  DemandState,
-};

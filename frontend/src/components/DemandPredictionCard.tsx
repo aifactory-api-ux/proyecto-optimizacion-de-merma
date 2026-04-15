@@ -1,237 +1,120 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, Typography, Box, Chip, Alert, AlertTitle } from '@mui/material';
-import { TrendingUp, TrendingDown, TrendingFlat, Inventory, Assessment } from '@mui/icons-material';
-import { formatNumber, formatCurrency, formatDate } from '../utils/format';
-
-/**
- * DemandPredictionCard Component
- * 
- * Displays demand prediction for a product on a given date.
- * Shows the predicted demand quantity, confidence level,
- * and visual indicators for the prediction trend.
- * 
- * Props:
- * - prediction: The predicted demand value
- * - confidence: Confidence level (0-1)
- * - productName: Name of the product
- * - date: Date for which prediction is made
- * - previousPrediction: Optional previous prediction for trend comparison
- * - onRefresh: Optional callback to refresh prediction
- */
+import React, { useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  CircularProgress,
+  Alert,
+  Chip,
+} from '@mui/material';
+import { TrendingUp, Assessment } from '@mui/icons-material';
+import type { DemandPredictionResponse } from '../types';
+import { formatNumber } from '../utils/format';
 
 interface DemandPredictionCardProps {
-  prediction: number;
-  confidence: number;
-  productName: string;
-  date: string;
-  previousPrediction?: number;
-  onRefresh?: () => void;
-  loading?: boolean;
-  error?: string;
+  prediction: DemandPredictionResponse | null;
+  isLoading: boolean;
+  error: Error | null;
+  onProductSelect: (id: number | null) => void;
+  selectedProductId: number | null;
 }
 
-export function DemandPredictionCard({
+export default function DemandPredictionCard({
   prediction,
-  confidence,
-  productName,
-  date,
-  previousPrediction,
-  onRefresh,
-  loading = false,
-  error
+  isLoading,
+  error,
+  onProductSelect,
+  selectedProductId,
 }: DemandPredictionCardProps) {
-  // Determine trend direction
-  const getTrendDirection = (): 'up' | 'down' | 'flat' => {
-    if (!previousPrediction) return 'flat';
-    const diff = prediction - previousPrediction;
-    if (diff > 0.05 * previousPrediction) return 'up';
-    if (diff < -0.05 * previousPrediction) return 'down';
-    return 'flat';
-  };
-
-  const trend = getTrendDirection();
-
-  // Get confidence level label
-  const getConfidenceLabel = (conf: number): { label: string; color: 'success' | 'warning' | 'error' } => {
-    if (conf >= 0.8) return { label: 'Alta', color: 'success' };
-    if (conf >= 0.6) return { label: 'Media', color: 'warning' };
-    return { label: 'Baja', color: 'error' };
-  };
-
-  const confidenceInfo = getConfidenceLabel(confidence);
-
-  // Get trend icon and color
-  const getTrendInfo = () => {
-    switch (trend) {
-      case 'up':
-        return { icon: <TrendingUp />, color: 'success', label: 'Aumento' };
-      case 'down':
-        return { icon: <TrendingDown />, color: 'error', label: 'Disminución' };
-      default:
-        return { icon: <TrendingFlat />, color: 'info', label: 'Estable' };
-    }
-  };
-
-  const trendInfo = getTrendInfo();
-
-  // Handle loading state
-  if (loading) {
-    return (
-      <Card sx={{ height: '100%', minHeight: 200 }}>
-        <CardHeader
-          title="Predicción de Demanda"
-          subheader={productName}
-          avatar={<Assessment color="primary" />}
-        />
-        <CardContent>
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight: 100
-          >
-            <Typography variant="body2" color="text.secondary">
-              Cargando predicción...
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Handle error state
-  if (error) {
-    return (
-      <Card sx={{ height: '100%', minHeight: 200 }}>
-        <CardHeader
-          title="Predicción de Demanda"
-          subheader={productName}
-          avatar={<Assessment color="primary" />}
-        />
-        <CardContent>
-          <Alert severity="error">
-            <AlertTitle>Error</AlertTitle>
-            {error}
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Main content
-  return (
-    <Card sx={{ height: '100%', minHeight: 200 }}>
-      <CardHeader
-        title="Predicción de Demanda"
-        subheader={`${productName} - ${formatDate(date)}`}
-        avatar={<Assessment color="primary" />}
-        action={
-          onRefresh && (
-            <Box
-              component="button"
-              onClick={onRefresh}
-              sx={{
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                p: 1,
-                borderRadius: 1,
-                '&:hover': { backgroundColor: 'action.hover' }
-              }}
-              aria-label="Actualizar predicción"
-            >
-              <Inventory color="action" />
-            </Box>
-          )
-        }
-      />
-      <CardContent>
-        <Box display="flex" flexDirection="column" gap={2}>
-          {/* Main prediction value */}
-          <Box>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Demanda Prevista
-            </Typography>
-            <Typography variant="h3" component="div" fontWeight="bold">
-              {formatNumber(prediction)}
-              <Typography
-                component="span"
-                variant="body2"
-                color="text.secondary"
-                sx={{ ml: 1 }}
-              >
-                unidades
-              </Typography>
-            </Typography>
-          </Box>
-
-          {/* Confidence and trend indicators */}
-          <Box display="flex" gap={1} flexWrap="wrap">
-            <Chip
-              icon={<Inventory />}
-              label={`Confianza: ${(confidence * 100).toFixed(0)}%`}
-              color={confidenceInfo.color}
-              variant="outlined"
-              size="small"
-            />
-            {previousPrediction !== undefined && (
-              <Chip
-                icon={trendInfo.icon}
-                label={`vs anterior: ${trendInfo.label}`}
-                color={trendInfo.color}
-                variant="outlined"
-                size="small"
-              />
-            )}
-          </Box>
-
-          {/* Metadata */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}
-          >
-            <Typography variant="caption" color="text.secondary">
-              Fecha: {formatDate(date)}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Actualizado: {formatDate(new Date().toISOString())}
-            </Typography>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
+  const [inputValue, setInputValue] = useState<string>(
+    selectedProductId !== null ? String(selectedProductId) : ''
   );
-}
 
-/**
- * DemandPredictionCardSkeleton Component
- * 
- * Loading skeleton for DemandPredictionCard.
- */
-export function DemandPredictionCardSkeleton() {
+  const handleSearch = () => {
+    const id = parseInt(inputValue, 10);
+    onProductSelect(isNaN(id) || id <= 0 ? null : id);
+  };
+
   return (
     <Card sx={{ height: '100%', minHeight: 200 }}>
-      <CardHeader
-        title="Cargando..."
-        subheader="Esperando datos"
-        avatar={<Assessment />}
-      />
       <CardContent>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight: 100
-        >
-          <Typography variant="body2" color="text.secondary">
-            Cargando predicción de demanda...
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <Assessment color="primary" />
+          <Typography variant="h6" fontWeight="bold">
+            Predicción de Demanda
           </Typography>
         </Box>
+
+        {/* Product selector */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+          <TextField
+            label="ID de Producto"
+            type="number"
+            size="small"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            inputProps={{ min: 1 }}
+            sx={{ flex: 1 }}
+          />
+          <Button
+            variant="contained"
+            size="small"
+            onClick={handleSearch}
+            disabled={isLoading || !inputValue}
+          >
+            Buscar
+          </Button>
+        </Box>
+
+        {/* Loading */}
+        {isLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+            <CircularProgress size={32} />
+          </Box>
+        )}
+
+        {/* Error */}
+        {!isLoading && error && (
+          <Alert severity="error" sx={{ mt: 1 }}>
+            {error.message}
+          </Alert>
+        )}
+
+        {/* Result */}
+        {!isLoading && !error && prediction && (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Demanda prevista para los próximos 7 días
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+              <Typography variant="h3" fontWeight="bold">
+                {formatNumber(prediction.demand_prediction, 0)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                unidades
+              </Typography>
+            </Box>
+            <Chip
+              icon={<TrendingUp />}
+              label={`Producto #${selectedProductId}`}
+              color="primary"
+              variant="outlined"
+              size="small"
+              sx={{ mt: 1 }}
+            />
+          </Box>
+        )}
+
+        {/* Empty state */}
+        {!isLoading && !error && !prediction && (
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+            Ingrese un ID de producto para ver la predicción.
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
 }
-
-export default DemandPredictionCard;

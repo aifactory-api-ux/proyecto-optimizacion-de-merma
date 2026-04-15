@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode, Component, ReactComponentElement } from 'react';
+import React, { useState, useEffect, createContext, useContext, ReactNode, Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './styles/theme';
@@ -30,8 +30,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Check for stored token on mount
-    const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('auth_user');
+    const storedToken = localStorage.getItem('access_token');
+    const storedUser = localStorage.getItem('auth_user_data');
     
     if (storedToken && storedUser) {
       try {
@@ -39,8 +39,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(storedToken);
         setUser(parsedUser);
       } catch (e) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('auth_user_data');
       }
     }
     setIsLoading(false);
@@ -49,15 +49,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = (newToken: string, newUser: { id: number; username: string; is_admin: boolean }) => {
     setToken(newToken);
     setUser(newUser);
-    localStorage.setItem('auth_token', newToken);
-    localStorage.setItem('auth_user', JSON.stringify(newUser));
+    localStorage.setItem('access_token', newToken);
+    localStorage.setItem('auth_user_data', JSON.stringify(newUser));
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('auth_user_data');
   };
 
   return (
