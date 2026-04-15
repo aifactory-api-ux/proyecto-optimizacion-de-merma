@@ -1,0 +1,154 @@
+# API_CONTRACT.md
+
+## Endpoints
+
+### 1. POST /auth/login
+
+| Property         | Value                       |
+|------------------|----------------------------|
+| HTTP Method      | POST                       |
+| Path             | /auth/login                |
+| Auth Required    | No                         |
+| Request Body     | `UserLoginRequest`         |
+| Response Body    | `UserLoginResponse`        |
+| Status Codes     | 200                        |
+
+#### Request Body: UserLoginRequest
+
+| Field     | Type   | Required |
+|-----------|--------|----------|
+| username  | string | Yes      |
+| password  | string | Yes      |
+
+#### Response Body: UserLoginResponse
+
+| Field        | Type   |
+|--------------|--------|
+| access_token | string |
+| token_type   | string |
+
+---
+
+### 2. GET /dashboard/metrics
+
+| Property         | Value                        |
+|------------------|-----------------------------|
+| HTTP Method      | GET                         |
+| Path             | /dashboard/metrics          |
+| Auth Required    | Yes (`Authorization: Bearer <token>`) |
+| Request Body     | None                        |
+| Response Body    | `DashboardMetricsResponse`  |
+| Status Codes     | 200                         |
+
+#### Response Body: DashboardMetricsResponse
+
+| Field                | Type             | Notes                |
+|----------------------|------------------|----------------------|
+| total_waste_quantity | float            |                      |
+| total_waste_cost     | float            |                      |
+| waste_by_product     | WasteMetric[]    |                      |
+| waste_trend          | WasteMetric[]    |                      |
+| alerts               | string[]         |                      |
+| demand_prediction    | float (optional) |                      |
+
+#### WasteMetric
+
+| Field          | Type    |
+|----------------|---------|
+| date           | string (ISO 8601) |
+| product_id     | int     |
+| product_name   | string  |
+| waste_quantity | float   |
+| waste_cost     | float   |
+
+---
+
+### 3. GET /alerts
+
+| Property         | Value                        |
+|------------------|-----------------------------|
+| HTTP Method      | GET                         |
+| Path             | /alerts                     |
+| Auth Required    | Yes (`Authorization: Bearer <token>`) |
+| Request Body     | None                        |
+| Response Body    | Alert[]                     |
+| Status Codes     | 200                         |
+
+#### Alert
+
+| Field      | Type    |
+|------------|---------|
+| id         | int     |
+| created_at | string (ISO 8601) |
+| message    | string  |
+| severity   | "info" \| "warning" \| "critical" |
+
+---
+
+### 4. GET /waste/by-product
+
+| Property         | Value                        |
+|------------------|-----------------------------|
+| HTTP Method      | GET                         |
+| Path             | /waste/by-product           |
+| Auth Required    | Yes (`Authorization: Bearer <token>`) |
+| Query Params     | start_date: string (ISO 8601) (required)<br>end_date: string (ISO 8601) (required) |
+| Request Body     | None                        |
+| Response Body    | WasteMetric[]               |
+| Status Codes     | 200                         |
+
+#### WasteMetric
+
+| Field          | Type    |
+|----------------|---------|
+| date           | string (ISO 8601) |
+| product_id     | int     |
+| product_name   | string  |
+| waste_quantity | float   |
+| waste_cost     | float   |
+
+---
+
+### 5. GET /waste/trend
+
+| Property         | Value                        |
+|------------------|-----------------------------|
+| HTTP Method      | GET                         |
+| Path             | /waste/trend                |
+| Auth Required    | Yes (`Authorization: Bearer <token>`) |
+| Query Params     | product_id: int (required)<br>start_date: string (ISO 8601) (required)<br>end_date: string (ISO 8601) (required) |
+| Request Body     | None                        |
+| Response Body    | WasteMetric[]               |
+| Status Codes     | 200                         |
+
+#### WasteMetric
+
+| Field          | Type    |
+|----------------|---------|
+| date           | string (ISO 8601) |
+| product_id     | int     |
+| product_name   | string  |
+| waste_quantity | float   |
+| waste_cost     | float   |
+
+---
+
+### 6. GET /demand/prediction
+
+| Property         | Value                        |
+|------------------|-----------------------------|
+| HTTP Method      | GET                         |
+| Path             | /demand/prediction          |
+| Auth Required    | Yes (`Authorization: Bearer <token>`) |
+| Query Params     | product_id: int (required)<br>date: string (ISO 8601) (required) |
+| Request Body     | None                        |
+| Response Body    | { demand_prediction: float } |
+| Status Codes     | 200                         |
+
+#### Response Body
+
+| Field              | Type  |
+|--------------------|-------|
+| demand_prediction  | float |
+
+---
