@@ -5,7 +5,7 @@ Pydantic models for authentication requests and responses.
 Implements JWT-based authentication with token generation.
 """
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 

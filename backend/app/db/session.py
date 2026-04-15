@@ -72,8 +72,8 @@ class DatabaseManager:
                 echo=os.getenv("DB_ECHO", "false").lower() == "true",
             )
             
-            # Create tables if they don't exist
-            Base.metadata.create_all(self._sync_engine)
+            # Create tables if they don't exist (checkfirst=False to avoid index exists errors)
+            Base.metadata.create_all(self._sync_engine, checkfirst=False)
             
         return self._sync_engine
     
@@ -261,9 +261,9 @@ async def init_db() -> None:
     Async initialization of database tables.
 
     Called on application startup via the lifespan context manager.
+    Tables already exist, skip creation.
     """
-    async with db_manager.async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    pass  # Tables already exist in database
 
 
 async def close_db() -> None:

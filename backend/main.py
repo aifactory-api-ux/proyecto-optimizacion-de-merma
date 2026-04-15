@@ -134,38 +134,33 @@ try:
     # Create API router with prefix
     api_router = APIRouter()
     
-    # Auth router
+    # Auth router (already has /auth prefix in auth.py)
     api_router.include_router(
         auth.router,
-        prefix="/auth",
         tags=["Authentication"]
     )
     
-    # Dashboard router
+    # Dashboard router (already has prefix)
     api_router.include_router(
         dashboard.router,
-        prefix="/dashboard",
         tags=["Dashboard"]
     )
     
-    # Alerts router
+    # Alerts router (already has prefix)
     api_router.include_router(
         alerts.router,
-        prefix="/alerts",
         tags=["Alerts"]
     )
     
-    # Waste router
+    # Waste router (already has prefix)
     api_router.include_router(
         waste.router,
-        prefix="/waste",
         tags=["Waste"]
     )
     
-    # Demand router
+    # Demand router (already has prefix)
     api_router.include_router(
         demand.router,
-        prefix="/demand",
         tags=["Demand"]
     )
     

@@ -9,7 +9,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Header, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -29,7 +29,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
 def get_current_user_id_from_token(
-    authorization: str = Depends(lambda: None)
+    authorization: Optional[str] = None
 ) -> Optional[int]:
     """
     Extract and validate user ID from Authorization header.
@@ -48,7 +48,7 @@ def get_current_user_id_from_token(
 
 
 async def get_current_user(
-    authorization: str = Depends(lambda: None)
+    authorization: Optional[str] = Header(None)
 ) -> int:
     """
     Dependency to get current authenticated user from JWT token.

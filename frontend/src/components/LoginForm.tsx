@@ -16,6 +16,7 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    console.log('LoginForm: Intentando iniciar sesión...');
 
     if (!username.trim() || !password.trim()) {
       setError('Por favor, ingrese usuario y contraseña');
@@ -24,14 +25,23 @@ export default function LoginForm() {
     }
 
     try {
+      console.log('LoginForm: Llamando API login...');
       const response = await login({ username: username.trim(), password });
+      console.log('LoginForm: Respuesta recibido:', response);
+      
+      console.log('LoginForm: Guardando token...');
       authLogin(response.access_token, {
         id: 0,
         username: username.trim(),
         is_admin: false,
       });
-      navigate('/dashboard');
+      console.log('LoginForm: Navegando a /dashboard');
+      alert('DEBUG: Login exitoso, nav to /dashboard');
+      console.log('LoginForm: Antes de navigate()');
+      window.location.href = '/dashboard';
+      console.log('LoginForm: Después de window.location');
     } catch (err) {
+      console.error('LoginForm: Error:', err);
       setError(err instanceof Error ? err.message : 'Error de autenticación. Verifique sus credenciales.');
     } finally {
       setLoading(false);
