@@ -43,7 +43,7 @@ async def get_demand_prediction(
     product_id: int = Query(..., description="Product ID for prediction", ge=1),
     date: str = Query(..., description="Date for prediction in ISO 8601 format"),
     db: Session = Depends(get_db),
-    token: str = Depends(verify_token_and_get_user_id),
+    authorization: str = Query(None, alias="Authorization"),
 ) -> DemandPredictionResponse:
     """Get demand prediction for a product on a given date.
     
@@ -51,7 +51,7 @@ async def get_demand_prediction(
         product_id: The unique identifier of the product
         date: The date for which to get prediction (ISO 8601 format)
         db: Database session
-        token: JWT authentication token
+        authorization: Bearer token for authentication
     
     Returns:
         DemandPredictionResponse: Object containing the demand prediction value
@@ -59,8 +59,21 @@ async def get_demand_prediction(
     Raises:
         HTTPException: If authentication fails or prediction not found
     """
-    # Validate token
-    user_id = verify_token_and_get_user_id(token) if token else None
+    if not authorization:
+        raise HTTPException(
+            status_code=HTTP_STATUS["UNAUTHORIZED"],
+            detail=ERROR_MESSAGES["UNAUTHORIZED"],
+        )
+    
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=HTTP_STATUS["UNAUTHORIZED"],
+            detail="Invalid authorization header format",
+        )
+    
+    token = parts[1]
+    user_id = verify_token_and_get_user_id(token)
     if user_id is None:
         raise HTTPException(
             status_code=HTTP_STATUS["UNAUTHORIZED"],

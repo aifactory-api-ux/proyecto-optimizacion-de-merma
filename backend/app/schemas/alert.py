@@ -19,13 +19,19 @@ class AlertResponse(BaseModel):
         created_at: Timestamp when alert was generated
         message: Alert message/description
         severity: Alert severity level (info, warning, critical)
+        product_id: Optional product identifier
+        store_id: Optional store identifier
+        alert_type: Type of alert
+        acknowledged_at: Timestamp when alert was acknowledged
+        resolved_at: Timestamp when alert was resolved
+        is_active: Whether alert is still active
     """
     id: int = Field(
         ...,
         description="Unique identifier of the alert",
         examples=[1]
     )
-    created_at: datetime = Field(
+    created_at: str = Field(
         ...,
         description="Timestamp when alert was generated",
         examples=["2026-04-15T10:30:00"]
@@ -41,6 +47,33 @@ class AlertResponse(BaseModel):
         examples=["warning"],
         pattern="^(info|warning|critical)$"
     )
+    product_id: Optional[int] = Field(
+        default=None,
+        description="Optional product identifier",
+        examples=[1]
+    )
+    store_id: Optional[int] = Field(
+        default=None,
+        description="Optional store identifier",
+        examples=[1]
+    )
+    alert_type: Optional[str] = Field(
+        default=None,
+        description="Type of alert",
+        examples=["waste_risk"]
+    )
+    acknowledged_at: Optional[str] = Field(
+        default=None,
+        description="Timestamp when alert was acknowledged"
+    )
+    resolved_at: Optional[str] = Field(
+        default=None,
+        description="Timestamp when alert was resolved"
+    )
+    is_active: bool = Field(
+        default=True,
+        description="Whether alert is still active"
+    )
 
     class Config:
         json_schema_extra = {
@@ -48,7 +81,13 @@ class AlertResponse(BaseModel):
                 "id": 1,
                 "created_at": "2026-04-15T10:30:00",
                 "message": "High waste detected for product Leche Entera 1L in Store 1",
-                "severity": "warning"
+                "severity": "warning",
+                "product_id": 1,
+                "store_id": 1,
+                "alert_type": "waste_risk",
+                "acknowledged_at": None,
+                "resolved_at": None,
+                "is_active": True
             }
         }
 
