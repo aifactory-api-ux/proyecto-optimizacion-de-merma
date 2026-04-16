@@ -56,12 +56,17 @@ class WasteByProductResponse(BaseModel):
     """Response model for waste by product aggregation.
     
     Attributes:
+        date: Date of the waste record
         product_id: Unique identifier of the product
         product_name: Name of the product
-        total_waste_quantity: Total amount of product wasted
-        total_waste_cost: Total monetary value of waste
-        record_count: Number of waste records in the period
+        waste_quantity: Total amount of product wasted
+        waste_cost: Total monetary value of waste
     """
+    date: datetime = Field(
+        ...,
+        description="Date of the waste record",
+        examples=["2026-04-15T00:00:00"]
+    )
     product_id: int = Field(
         ...,
         description="Unique identifier of the product",
@@ -72,39 +77,33 @@ class WasteByProductResponse(BaseModel):
         description="Name of the product",
         examples=["Leche Entera 1L"]
     )
-    total_waste_quantity: float = Field(
+    waste_quantity: float = Field(
         ...,
         description="Total amount of product wasted",
         ge=0,
         examples=[150.5]
     )
-    total_waste_cost: float = Field(
+    waste_cost: float = Field(
         ...,
         description="Total monetary value of wasted products",
         ge=0,
         examples=[1505.00]
     )
-    record_count: int = Field(
-        ...,
-        description="Number of waste records in the period",
-        ge=0,
-        examples=[25]
-    )
 
     class Config:
         json_schema_extra = {
             "example": {
+                "date": "2026-04-15T00:00:00",
                 "product_id": 1,
                 "product_name": "Leche Entera 1L",
-                "total_waste_quantity": 150.5,
-                "total_waste_cost": 1505.00,
-                "record_count": 25
+                "waste_quantity": 150.5,
+                "waste_cost": 1505.00
             }
         }
 
 
 class WasteTrendResponse(BaseModel):
-    """"Response model for waste trend data points.
+    """Response model for waste trend data points.
     
     Attributes:
         date: Date of the waste record
@@ -159,9 +158,13 @@ class WasteSummaryResponse(BaseModel):
     Attributes:
         total_waste_quantity: Total quantity wasted in the period
         total_waste_cost: Total cost of waste in the period
-        waste_by_product: Breakdown of waste by product
-        period_start: Start date of the reporting period
-        period_end: End date of the reporting period
+        unique_products: Number of unique products
+        unique_stores: Number of unique stores
+        total_records: Total number of waste records
+        avg_daily_quantity: Average daily waste quantity
+        avg_daily_cost: Average daily waste cost
+        start_date: Start date of the reporting period
+        end_date: End date of the reporting period
     """
     total_waste_quantity: float = Field(
         ...,
@@ -175,15 +178,41 @@ class WasteSummaryResponse(BaseModel):
         ge=0,
         examples=[15000.00]
     )
-    waste_by_product: List[WasteByProductResponse] = Field(
+    unique_products: int = Field(
         ...,
-        description="Breakdown of waste grouped by product"
+        description="Number of unique products with waste",
+        ge=0,
+        examples=[25]
     )
-    period_start: datetime = Field(
+    unique_stores: int = Field(
+        ...,
+        description="Number of unique stores with waste",
+        ge=0,
+        examples=[3]
+    )
+    total_records: int = Field(
+        ...,
+        description="Total number of waste records",
+        ge=0,
+        examples=[150]
+    )
+    avg_daily_quantity: float = Field(
+        ...,
+        description="Average daily waste quantity",
+        ge=0,
+        examples=[50.0]
+    )
+    avg_daily_cost: float = Field(
+        ...,
+        description="Average daily waste cost",
+        ge=0,
+        examples=[500.00]
+    )
+    start_date: str = Field(
         ...,
         description="Start date of the reporting period"
     )
-    period_end: datetime = Field(
+    end_date: str = Field(
         ...,
         description="End date of the reporting period"
     )
@@ -193,17 +222,13 @@ class WasteSummaryResponse(BaseModel):
             "example": {
                 "total_waste_quantity": 1500.0,
                 "total_waste_cost": 15000.00,
-                "waste_by_product": [
-                    {
-                        "product_id": 1,
-                        "product_name": "Leche Entera 1L",
-                        "total_waste_quantity": 150.5,
-                        "total_waste_cost": 1505.00,
-                        "record_count": 25
-                    }
-                ],
-                "period_start": "2026-01-01T00:00:00",
-                "period_end": "2026-04-15T23:59:59"
+                "unique_products": 25,
+                "unique_stores": 3,
+                "total_records": 150,
+                "avg_daily_quantity": 50.0,
+                "avg_daily_cost": 500.00,
+                "start_date": "2026-01-01T00:00:00",
+                "end_date": "2026-04-15T23:59:59"
             }
         }
 
