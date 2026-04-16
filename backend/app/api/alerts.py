@@ -218,8 +218,6 @@ def create_alert(
         )
     
     # Create new alert
-    from datetime import datetime
-    
     new_alert = Alert(
         product_id=alert_data.get("product_id"),
         store_id=alert_data.get("store_id"),

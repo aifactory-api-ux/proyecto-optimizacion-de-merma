@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
+from sqlalchemy import Index
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 

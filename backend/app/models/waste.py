@@ -164,6 +164,7 @@ class Product(Base):
     waste_metrics = relationship("WasteMetric", back_populates="product")
     alerts = relationship("Alert", back_populates="product")
     demand_predictions = relationship("DemandPrediction", back_populates="product")
+    inventory = relationship("InventoryStore", back_populates="product")
     
     def __repr__(self) -> str:
         return f"<Product(id={self.id}, sku='{self.sku}', name='{self.name}')>"
@@ -199,6 +200,7 @@ class Store(Base):
     waste_metrics = relationship("WasteMetric", back_populates="store")
     alerts = relationship("Alert", back_populates="store")
     demand_predictions = relationship("DemandPrediction", back_populates="store")
+    inventory = relationship("InventoryStore", back_populates="store")
     
     def __repr__(self) -> str:
         return f"<Store(id={self.id}, store_code='{self.store_code}', name='{self.name}')>"
