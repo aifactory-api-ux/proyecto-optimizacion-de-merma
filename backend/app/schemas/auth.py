@@ -41,10 +41,13 @@ class UserLoginRequest(BaseModel):
 
 class UserLoginResponse(BaseModel):
     """Response model for successful user login.
-    
+
     Attributes:
         access_token: JWT token for subsequent API requests
         token_type: Type of token (typically 'bearer')
+        user_id: User ID
+        username: Username
+        is_admin: Whether user has admin privileges
     """
     access_token: str = Field(
         ...,
@@ -54,12 +57,18 @@ class UserLoginResponse(BaseModel):
         default="bearer",
         description="Token type identifier"
     )
+    user_id: int = Field(description="User ID from database")
+    username: str = Field(description="Username")
+    is_admin: bool = Field(default=False, description="Admin flag")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer"
+                "token_type": "bearer",
+                "user_id": 1,
+                "username": "admin",
+                "is_admin": True
             }
         }
 

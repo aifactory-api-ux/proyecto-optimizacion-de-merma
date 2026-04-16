@@ -75,5 +75,8 @@ def login(
     
     return UserLoginResponse(
         access_token=access_token,
-        token_type="bearer"
+        token_type="bearer",
+        user_id=user["id"],
+        username=user["username"],
+        is_admin=user.get("is_admin", False)
     )

@@ -19,6 +19,9 @@ export interface UserLoginRequest {
 export interface UserLoginResponse {
   access_token: string;
   token_type: string;
+  user_id: number;
+  username: string;
+  is_admin: boolean;
 }
 
 // ==================== Dashboard Types ====================
