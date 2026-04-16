@@ -26,9 +26,9 @@ export default function LoginForm() {
     try {
       const response = await login({ username: username.trim(), password });
       authLogin(response.access_token, {
-        id: 0,
-        username: username.trim(),
-        is_admin: false,
+        id: response.user_id,
+        username: response.username,
+        is_admin: response.is_admin,
       });
       navigate('/dashboard');
     } catch (err) {

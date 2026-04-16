@@ -1,38 +1,5 @@
-import axios from 'axios';
+import api from './index';
 import type { Alert } from '../types';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:20001/api/v1';
-
-const alertsClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-alertsClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-alertsClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('access_token');
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 export interface AlertsResponse {
   alerts: Alert[];
@@ -53,71 +20,41 @@ export interface AlertUpdateRequest {
 }
 
 export const fetchAlerts = async (): Promise<Alert[]> => {
-  try {
-    const response = await alertsClient.get<Alert[]>('/alerts');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching alerts:', error);
-    throw error;
-  }
+  const response = await api.get<Alert[]>('/alerts');
+  return response.data;
 };
 
 export const fetchAlertsBySeverity = async (
   severity: 'info' | 'warning' | 'critical'
 ): Promise<Alert[]> => {
-  try {
-    const response = await alertsClient.get<Alert[]>('/alerts', {
-      params: { severity },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching alerts by severity:', error);
-    throw error;
-  }
+  const response = await api.get<Alert[]>('/alerts', {
+    params: { severity },
+  });
+  return response.data;
 };
 
 export const fetchAlertsByProduct = async (productId: number): Promise<Alert[]> => {
-  try {
-    const response = await alertsClient.get<Alert[]>('/alerts', {
-      params: { product_id: productId },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching alerts by product:', error);
-    throw error;
-  }
+  const response = await api.get<Alert[]>('/alerts', {
+    params: { product_id: productId },
+  });
+  return response.data;
 };
 
 export const fetchAlertsByStore = async (storeId: number): Promise<Alert[]> => {
-  try {
-    const response = await alertsClient.get<Alert[]>('/alerts', {
-      params: { store_id: storeId },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching alerts by store:', error);
-    throw error;
-  }
+  const response = await api.get<Alert[]>('/alerts', {
+    params: { store_id: storeId },
+  });
+  return response.data;
 };
 
 export const acknowledgeAlert = async (alertId: number): Promise<Alert> => {
-  try {
-    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}/acknowledge`, {});
-    return response.data;
-  } catch (error) {
-    console.error('Error acknowledging alert:', error);
-    throw error;
-  }
+  const response = await api.patch<Alert>(`/alerts/${alertId}/acknowledge`, {});
+  return response.data;
 };
 
 export const resolveAlert = async (alertId: number): Promise<Alert> => {
-  try {
-    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}/resolve`, {});
-    return response.data;
-  } catch (error) {
-    console.error('Error resolving alert:', error);
-    throw error;
-  }
+  const response = await api.patch<Alert>(`/alerts/${alertId}/resolve`, {});
+  return response.data;
 };
 
 export interface GetAlertsParams {
@@ -127,13 +64,8 @@ export interface GetAlertsParams {
 }
 
 export const getAlerts = async (params?: GetAlertsParams): Promise<Alert[]> => {
-  try {
-    const response = await alertsClient.get<Alert[]>('/alerts', { params });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching alerts:', error);
-    throw error;
-  }
+  const response = await api.get<Alert[]>('/alerts', { params });
+  return response.data;
 };
 
 export default {
