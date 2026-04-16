@@ -27,6 +27,7 @@ from app.schemas.waste import (
     UpdateWasteRecordRequest,
     WasteRecordResponse,
 )
+from app.models.waste import WasteRecord, Product, Store
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,7 @@ def get_waste_by_product(
     waste_by_product = []
     for row in waste_query:
         waste_by_product.append(
-            WasteMetric(
+            WasteByProductResponse(
                 date=start_dt,
                 product_id=row.product_id,
                 product_name=row.product_name,
@@ -204,16 +205,10 @@ def get_waste_by_product(
         f"Total quantity: {total_quantity}, Total cost: {total_cost}"
     )
     
-    return WasteByProductResponse(
-        waste_by_product=waste_by_product,
-        total_waste_quantity=total_quantity,
-        total_waste_cost=total_cost,
-        start_date=start_date,
-        end_date=end_date,
-    )
+    return waste_by_product
 
 
-@router.get("/trend", response_model=WasteTrendResponse)
+@router.get("/trend", response_model=List[WasteTrendResponse])
 def get_waste_trend(
     product_id: int = Query(..., description="Product ID"),
     start_date: str = Query(..., description="Start date in ISO 8601 format"),
@@ -283,7 +278,7 @@ def get_waste_trend(
     waste_trend = []
     for row in waste_metrics:
         waste_trend.append(
-            WasteMetric(
+            WasteTrendResponse(
                 date=row.date,
                 product_id=row.product_id,
                 product_name=row.product_name,
@@ -300,15 +295,7 @@ def get_waste_trend(
         f"Total quantity: {total_quantity}, Total cost: {total_cost}"
     )
     
-    return WasteTrendResponse(
-        waste_trend=waste_trend,
-        product_id=product_id,
-        product_name=product.name,
-        total_waste_quantity=total_quantity,
-        total_waste_cost=total_cost,
-        start_date=start_date,
-        end_date=end_date,
-    )
+    return waste_trend
 
 
 @router.get("/summary", response_model=WasteSummaryResponse)
