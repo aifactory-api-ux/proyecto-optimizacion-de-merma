@@ -147,8 +147,8 @@ class InventoryStore(Base):
     last_updated = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
-    product = relationship("Product", back_populates="inventory")
-    store = relationship("Store", back_populates="inventory")
+    product = relationship("Product")
+    store = relationship("Store")
 
     __table_args__ = (
         Index('ix_inventory_product_store', 'product_id', 'store_id', unique=True),
