@@ -40,6 +40,22 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting application: %s v%s", settings.APP_NAME, settings.APP_VERSION)
     
+    # Validate critical environment variables
+    missing_vars = []
+    if not settings.POSTGRES_HOST:
+        missing_vars.append("POSTGRES_HOST")
+    if not settings.POSTGRES_USER:
+        missing_vars.append("POSTGRES_USER")
+    if not settings.POSTGRES_DB:
+        missing_vars.append("POSTGRES_DB")
+    if not settings.JWT_SECRET_KEY:
+        missing_vars.append("JWT_SECRET_KEY")
+    if missing_vars:
+        error_msg = f"Missing required environment variables: {', '.join(missing_vars)}"
+        logger.error(error_msg)
+        raise ValueError(error_msg)
+    logger.info("Startup validation passed")
+    
     # Initialize database connection
     try:
         await init_db()
