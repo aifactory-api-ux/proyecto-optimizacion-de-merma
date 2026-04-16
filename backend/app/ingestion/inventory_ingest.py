@@ -143,8 +143,8 @@ class InventoryStore(Base):
     minimum_stock = Column(Float, nullable=False, default=0.0)
     maximum_stock = Column(Float, nullable=False, default=1000.0)
     reorder_point = Column(Float, nullable=False, default=0.0)
-    last_updated = Column(DateTime, default=datetime.utcnow, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_updated = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     product = relationship("Product", back_populates="inventory")
     store = relationship("Store", back_populates="inventory")
@@ -214,7 +214,6 @@ def create_inventory_record(
     Returns:
         Created InventoryStore object
     """
-    from datetime import datetime
     from shared.utils import parse_date
     
     last_restock = None
@@ -254,7 +253,6 @@ def update_inventory_record(
     Returns:
         Updated InventoryStore object
     """
-    from datetime import datetime
     from shared.utils import parse_date
     
     inventory.quantity_in_stock = record.quantity_in_stock

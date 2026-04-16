@@ -6,6 +6,7 @@ retrieving, creating, updating, and acknowledging alerts.
 """
 
 import logging
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -280,8 +281,7 @@ def acknowledge_alert(
         )
     
     # Update acknowledgment
-    from datetime import datetime
-    alert.acknowledged_at = datetime.utcnow()
+    alert.acknowledged_at = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(alert)
@@ -334,8 +334,7 @@ def resolve_alert(
         )
     
     # Update resolution
-    from datetime import datetime
-    alert.resolved_at = datetime.utcnow()
+    alert.resolved_at = datetime.now(timezone.utc)
     alert.is_active = 0
     
     db.commit()
