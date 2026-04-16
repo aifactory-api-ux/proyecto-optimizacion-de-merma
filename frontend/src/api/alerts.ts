@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Alert } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 const alertsClient = axios.create({
   baseURL: API_URL,
@@ -10,7 +10,6 @@ const alertsClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
 alertsClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
@@ -19,18 +18,17 @@ alertsClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors
 alertsClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
-      window.location.href = '/login';
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -54,10 +52,6 @@ export interface AlertUpdateRequest {
   is_active?: number;
 }
 
-/**
- * Fetch all active alerts
- * @returns Promise with array of active alerts
- */
 export const fetchAlerts = async (): Promise<Alert[]> => {
   try {
     const response = await alertsClient.get<Alert[]>('/alerts');
@@ -68,11 +62,6 @@ export const fetchAlerts = async (): Promise<Alert[]> => {
   }
 };
 
-/**
- * Fetch alerts filtered by severity
- * @param severity - Filter by severity level
- * @returns Promise with filtered alerts
- */
 export const fetchAlertsBySeverity = async (
   severity: 'info' | 'warning' | 'critical'
 ): Promise<Alert[]> => {
@@ -87,11 +76,6 @@ export const fetchAlertsBySeverity = async (
   }
 };
 
-/**
- * Fetch alerts for a specific product
- * @param productId - Product ID to filter alerts
- * @returns Promise with product-specific alerts
- */
 export const fetchAlertsByProduct = async (productId: number): Promise<Alert[]> => {
   try {
     const response = await alertsClient.get<Alert[]>('/alerts', {
@@ -104,11 +88,6 @@ export const fetchAlertsByProduct = async (productId: number): Promise<Alert[]> 
   }
 };
 
-/**
- * Fetch alerts for a specific store
- * @param storeId - Store ID to filter alerts
- * @returns Promise with store-specific alerts
- */
 export const fetchAlertsByStore = async (storeId: number): Promise<Alert[]> => {
   try {
     const response = await alertsClient.get<Alert[]>('/alerts', {
@@ -121,16 +100,9 @@ export const fetchAlertsByStore = async (storeId: number): Promise<Alert[]> => {
   }
 };
 
-/**
- * Acknowledge an alert
- * @param alertId - ID of the alert to acknowledge
- * @returns Promise with updated alert
- */
 export const acknowledgeAlert = async (alertId: number): Promise<Alert> => {
   try {
-    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}`, {
-      acknowledged_at: new Date().toISOString(),
-    });
+    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}/acknowledge`, {});
     return response.data;
   } catch (error) {
     console.error('Error acknowledging alert:', error);
@@ -138,17 +110,9 @@ export const acknowledgeAlert = async (alertId: number): Promise<Alert> => {
   }
 };
 
-/**
- * Resolve an alert
- * @param alertId - ID of the alert to resolve
- * @returns Promise with resolved alert
- */
 export const resolveAlert = async (alertId: number): Promise<Alert> => {
   try {
-    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}`, {
-      resolved_at: new Date().toISOString(),
-      is_active: 0,
-    });
+    const response = await alertsClient.patch<Alert>(`/alerts/${alertId}/resolve`, {});
     return response.data;
   } catch (error) {
     console.error('Error resolving alert:', error);
@@ -156,27 +120,6 @@ export const resolveAlert = async (alertId: number): Promise<Alert> => {
   }
 };
 
-/**
- * Get count of active alerts by severity
- * @returns Promise with alert counts by severity
- */
-export const getAlertCounts = async (): Promise<{
-  info: number;
-  warning: number;
-  critical: number;
-  total: number;
-}> => {
-  try {
-    const response = await alertsClient.get('/alerts/count');
-    return response.data;
-  } catch (error) {
-    console.error('Error getting alert counts:', error);
-    // Return default counts on error
-    return { info: 0, warning: 0, critical: 0, total: 0 };
-  }
-};
-
-// Added for useAlerts.ts compatibility
 export interface GetAlertsParams {
   severity?: 'info' | 'warning' | 'critical';
   product_id?: number;
@@ -200,6 +143,5 @@ export default {
   fetchAlertsByStore,
   acknowledgeAlert,
   resolveAlert,
-  getAlertCounts,
   getAlerts,
 };

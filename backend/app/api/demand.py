@@ -210,28 +210,8 @@ async def get_recommendations(
     product_id: int,
     store_id: Optional[int] = Query(None, description="Store ID"),
     db: Session = Depends(get_db),
-    token: str = Depends(verify_token_and_get_user_id),
+    user_id: int = Depends(require_auth),
 ) -> dict:
-    """Get inventory recommendations for a product.
-    
-    Based on demand prediction and current inventory levels,
-    provides recommendations for reorder, discount, or no action.
-    
-    Args:
-        product_id: The unique identifier of the product
-        store_id: Optional store ID (uses default if not provided)
-        db: Database session
-        token: JWT authentication token
-    
-    Returns:
-        Dictionary containing recommendation and reasoning
-    """
-    user_id = verify_token_and_get_user_id(token) if token else None
-    if user_id is None:
-        raise HTTPException(
-            status_code=HTTP_STATUS["UNAUTHORIZED"],
-            detail=ERROR_MESSAGES["UNAUTHORIZED"],
-        )
     
     demand_service = DemandService(db)
     
