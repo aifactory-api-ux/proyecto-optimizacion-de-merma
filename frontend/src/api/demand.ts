@@ -55,34 +55,31 @@ export interface GetBatchDemandPredictionsParams {
 
 /**
  * Fetches demand predictions for multiple products.
- * Makes individual requests for each product.
- * 
+ * Makes parallel requests for each product.
+ *
  * @param params - Object containing product_ids and date range
  * @returns Promise with array of demand predictions
- * @throws Error if any API request fails
  */
 export async function getBatchDemandPredictions(
   params: GetBatchDemandPredictionsParams
 ): Promise<DemandPredictionResponse[]> {
   const { product_ids, startDate } = params;
-  
-  const predictions: DemandPredictionResponse[] = [];
-  
-  // Fetch prediction for each product
-  for (const product_id of product_ids) {
-    try {
-      const prediction = await getDemandPrediction({
-        product_id,
-        date: startDate,
-      });
-      predictions.push(prediction);
-    } catch (error) {
-      // Log error but continue with other products
-      console.error(`Failed to get prediction for product ${product_id}:`, error);
-    }
-  }
-  
-  return predictions;
+
+  const results = await Promise.all(
+    product_ids.map(async (product_id) => {
+      try {
+        return await getDemandPrediction({
+          product_id,
+          date: startDate,
+        });
+      } catch (error) {
+        console.error(`Failed to get prediction for product ${product_id}:`, error);
+        return null;
+      }
+    })
+  );
+
+  return results.filter((p): p is DemandPredictionResponse => p !== null);
 }
 
 /**
