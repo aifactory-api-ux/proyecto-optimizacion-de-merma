@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.models.waste import Product, Store, WasteRecord
-from app.db.session import get_db_session
+from app.db.session import get_db
 
 logger = logging.getLogger(__name__)
 
