@@ -24,8 +24,8 @@ from app.models.waste import Product, Store, WasteRecord, WasteMetric
 from app.models.user import User
 from shared.constants import (
     AlertSeverity,
-    DEFAULT_WASTE_THRESHOLD_PERCENT,
-    CRITICAL_WASTE_THRESHOLD_PERCENT,
+    DEFAULT_WASTE_THRESHOLD,
+    CRITICAL_WASTE_THRESHOLD,
     FORECAST_WINDOW_DAYS,
     FORECAST_HISTORY_DAYS,
     MIN_HISTORY_FOR_PREDICTION,
@@ -233,10 +233,10 @@ def generate_alerts(db: Session, result: NightlyTaskResult) -> None:
                 # Using simplified logic - in production would compare against inventory value
                 waste_ratio = total_waste / 1000  # Simplified benchmark
                 
-                if waste_ratio > CRITICAL_WASTE_THRESHOLD_PERCENT / 100:
+                if waste_ratio > CRITICAL_WASTE_THRESHOLD:
                     severity = AlertSeverity.CRITICAL
                     alert_type = "high_waste"
-                elif waste_ratio > DEFAULT_WASTE_THRESHOLD_PERCENT / 100:
+                elif waste_ratio > DEFAULT_WASTE_THRESHOLD:
                     severity = AlertSeverity.WARNING
                     alert_type = "elevated_waste"
                 else:
