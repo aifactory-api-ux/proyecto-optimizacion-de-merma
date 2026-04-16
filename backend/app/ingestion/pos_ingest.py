@@ -7,7 +7,7 @@ POS transaction records.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 
 from sqlalchemy import select
@@ -194,10 +194,10 @@ class POSIngestionService:
             waste_record = WasteRecord(
                 product_id=product_id,
                 store_id=store_id,
-                quantity=payload["quantity_sold"],
-                sale_date=sale_date,
-                unit_price=payload.get("unit_price", 0.0),
-                created_at=datetime.utcnow()
+                quantity_wasted=payload["quantity_sold"],
+                cost_wasted=payload.get("unit_price", 0.0) * payload["quantity_sold"],
+                waste_reason="pos_ingestion",
+                recorded_at=sale_date,
             )
             self.db_session.add(waste_record)
             self.db_session.commit()

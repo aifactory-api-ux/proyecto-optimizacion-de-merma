@@ -152,7 +152,7 @@ class RecommendationType(str, Enum):
     REORDER = "reorder"
     DISCOUNT = "discount"
     NO_REORDER = "no_reorder"
-    markdown = "markdown"
+    MARKDOWN = "markdown"
     DONATE = "donate"
     DISPOSE = "dispose"
 
