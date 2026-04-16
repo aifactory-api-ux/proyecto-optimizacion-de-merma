@@ -7,7 +7,7 @@ normalization, and storage of inventory records in the database.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from app.db.session import get_db
+from app.db.base import Base
 from app.models.waste import Product, Store
 from shared.constants import HTTP_STATUS, ERROR_MESSAGES
 
@@ -119,30 +120,10 @@ class InventoryIngestResponse(BaseModel):
 
 
 class InventoryStore(Base):
-    """Inventory storage model - tracks inventory levels per product/store.
-    
-    This model stores the current inventory state for each product at each store.
-    
-    Attributes:
-        id: Primary key
-        product_id: Foreign key to products table
-        store_id: Foreign key to stores table
-        quantity_in_stock: Current quantity in stock
-        quantity_reserved: Quantity reserved for orders
-        last_restock_date: Date of last restock
-        minimum_stock: Minimum stock threshold
-        maximum_stock: Maximum stock threshold
-        reorder_point: Point at which reorder should be triggered
-        last_updated: Timestamp of last update
-        created_at: Timestamp of record creation
-    """
-    from app.db.base import Base
-    
+    """Inventory storage model - tracks inventory levels per product/store."""
+
     __tablename__ = "inventory"
-    
-    from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-    from sqlalchemy.orm import relationship
-    
+
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     product_id = Column(
         Integer,
@@ -164,12 +145,10 @@ class InventoryStore(Base):
     reorder_point = Column(Float, nullable=False, default=0.0)
     last_updated = Column(DateTime, default=datetime.utcnow, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    
-    # Relationships
+
     product = relationship("Product", back_populates="inventory")
     store = relationship("Store", back_populates="inventory")
-    
-    # Unique constraint for product/store combination
+
     __table_args__ = (
         Index('ix_inventory_product_store', 'product_id', 'store_id', unique=True),
     )
@@ -287,7 +266,7 @@ def update_inventory_record(
     inventory.minimum_stock = record.minimum_stock
     inventory.maximum_stock = record.maximum_stock
     inventory.reorder_point = record.reorder_point
-    inventory.last_updated = datetime.utcnow()
+    inventory.last_updated = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(inventory)
@@ -445,5 +424,4 @@ def validate_inventory_payload(payload: Dict[str, Any]) -> List[str]:
     return errors
 
 
-# Import required for Index creation in InventoryStore model
-from sqlalchemy import Index
+
