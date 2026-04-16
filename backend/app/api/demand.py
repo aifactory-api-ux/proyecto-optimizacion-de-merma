@@ -38,6 +38,20 @@ def get_current_user_id_from_token(
     pass
 
 
+def require_auth(authorization: str = Query(None, alias="Authorization")) -> int:
+    """Extract and validate user ID from Authorization header."""
+    if not authorization:
+        raise HTTPException(status_code=HTTP_STATUS["UNAUTHORIZED"], detail=ERROR_MESSAGES["UNAUTHORIZED"])
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(status_code=HTTP_STATUS["UNAUTHORIZED"], detail="Invalid authorization header format")
+    token = parts[1]
+    user_id = verify_token_and_get_user_id(token)
+    if user_id is None:
+        raise HTTPException(status_code=HTTP_STATUS["UNAUTHORIZED"], detail=ERROR_MESSAGES["UNAUTHORIZED"])
+    return user_id
+
+
 @router.get("/prediction", response_model=DemandPredictionResponse)
 async def get_demand_prediction(
     product_id: int = Query(..., description="Product ID for prediction", ge=1),
@@ -127,27 +141,8 @@ async def get_demand_prediction(
 async def create_demand_prediction(
     request: DemandPredictionRequest,
     db: Session = Depends(get_db),
-    token: str = Depends(verify_token_and_get_user_id),
+    user_id: int = Depends(require_auth),
 ) -> DemandPredictionDetail:
-    """Create a new demand prediction.
-    
-    Args:
-        request: Demand prediction request data
-        db: Database session
-        token: JWT authentication token
-    
-    Returns:
-        DemandPredictionDetail: Created prediction details
-    
-    Raises:
-        HTTPException: If authentication fails or creation fails
-    """
-    user_id = verify_token_and_get_user_id(token) if token else None
-    if user_id is None:
-        raise HTTPException(
-            status_code=HTTP_STATUS["UNAUTHORIZED"],
-            detail=ERROR_MESSAGES["UNAUTHORIZED"],
-        )
     
     demand_service = DemandService(db)
     
@@ -178,27 +173,8 @@ async def get_forecast(
     end_date: str = Query(..., description="End date in ISO 8601 format"),
     store_id: Optional[int] = Query(None, description="Optional store ID filter"),
     db: Session = Depends(get_db),
-    token: str = Depends(verify_token_and_get_user_id),
+    user_id: int = Depends(require_auth),
 ) -> list[DemandPredictionDetail]:
-    """Get demand forecast for a product over a date range.
-    
-    Args:
-        product_id: The unique identifier of the product
-        start_date: Start date for forecast (ISO 8601 format)
-        end_date: End date for forecast (ISO 8601 format)
-        store_id: Optional store ID to filter results
-        db: Database session
-        token: JWT authentication token
-    
-    Returns:
-        List of DemandPredictionDetail: Forecast data for the date range
-    """
-    user_id = verify_token_and_get_user_id(token) if token else None
-    if user_id is None:
-        raise HTTPException(
-            status_code=HTTP_STATUS["UNAUTHORIZED"],
-            detail=ERROR_MESSAGES["UNAUTHORIZED"],
-        )
     
     # Parse dates
     try:
