@@ -12,8 +12,8 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import Index
-from sqlalchemy.orm import Session
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy.exc import IntegrityError
 
 from app.db.session import get_db
