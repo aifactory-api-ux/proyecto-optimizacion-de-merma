@@ -488,8 +488,86 @@ class DemandService:
         self.db.commit()
         
         logger.info(f"Cleaned up {deleted} old demand predictions")
-        
+
         return deleted
+
+    def get_forecast_range(
+        self,
+        product_id: int,
+        start_date: datetime,
+        end_date: datetime,
+        store_id: Optional[int] = None,
+    ) -> List[DemandPrediction]:
+        """Get demand predictions for a product over a date range.
+
+        Args:
+            product_id: Product ID to filter by
+            start_date: Start date for range
+            end_date: End date for range
+            store_id: Optional store ID to filter by
+
+        Returns:
+            List of DemandPrediction objects
+        """
+        return self.get_predictions_by_product(product_id, start_date, end_date, store_id)
+
+    def get_inventory_recommendation(
+        self,
+        product_id: int,
+        store_id: Optional[int] = None,
+    ) -> dict:
+        """Get inventory recommendation for a product.
+
+        Based on demand prediction and current inventory levels,
+        provides a recommendation for reorder, discount, or no action.
+
+        Args:
+            product_id: Product ID
+            store_id: Optional store ID
+
+        Returns:
+            Dictionary with recommendation and reasoning
+        """
+        from shared.constants import RecommendationType
+
+        today = datetime.utcnow()
+        prediction = self.get_prediction(product_id, today, store_id)
+
+        if prediction is None:
+            predicted_demand, _ = self.calculate_demand_prediction(product_id, today, store_id)
+        else:
+            predicted_demand = prediction
+
+        product = self.db.query(Product).filter(Product.id == product_id).first()
+
+        if not product:
+            return {
+                "product_id": product_id,
+                "recommendation": RecommendationType.NO_REORDER.value,
+                "reasoning": "Product not found",
+                "confidence": 0.0,
+            }
+
+        avg_daily = self._calculate_default_prediction(product_id, today, store_id)[0]
+        threshold = avg_daily * 0.8
+
+        if predicted_demand > threshold:
+            recommendation = RecommendationType.REORDER.value
+            reasoning = f"High demand predicted ({predicted_demand:.1f} units/day). Reorder recommended."
+        elif predicted_demand < avg_daily * 0.3:
+            recommendation = RecommendationType.DISCOUNT.value
+            reasoning = f"Low demand predicted ({predicted_demand:.1f} units/day). Consider discount to reduce waste risk."
+        else:
+            recommendation = RecommendationType.NO_REORDER.value
+            reasoning = f"Stable demand ({predicted_demand:.1f} units/day). Maintain current stock levels."
+
+        return {
+            "product_id": product_id,
+            "product_name": product.name,
+            "predicted_demand": predicted_demand,
+            "recommendation": recommendation,
+            "reasoning": reasoning,
+        }
 
 
 def get_demand_service(db: Session, cache: Optional[CacheManager] = None) -> DemandService:
