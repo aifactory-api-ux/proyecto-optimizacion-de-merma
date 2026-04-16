@@ -5,7 +5,7 @@ SQLAlchemy models for tracking alerts in the waste optimization system.
 Provides alert generation, classification, and lifecycle management.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import (
@@ -56,7 +56,7 @@ class Alert(Base):
     severity = Column(String(20), nullable=False, index=True)
     alert_type = Column(String(50), nullable=False, index=True)
     message = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
     acknowledged_at = Column(DateTime, nullable=True)
     resolved_at = Column(DateTime, nullable=True)
     is_active = Column(Integer, default=1, nullable=False, index=True)

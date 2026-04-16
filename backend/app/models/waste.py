@@ -5,7 +5,7 @@ SQLAlchemy models for tracking waste in products and stores.
 Provides waste recording, metrics aggregation, and trend analysis.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import (

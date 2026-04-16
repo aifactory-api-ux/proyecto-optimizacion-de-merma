@@ -4,7 +4,7 @@ Security Utilities
 Implements authentication, password hashing, and JWT token utilities.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import bcrypt

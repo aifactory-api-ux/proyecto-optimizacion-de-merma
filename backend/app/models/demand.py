@@ -5,7 +5,7 @@ SQLAlchemy models for tracking demand predictions and forecasts.
 Provides demand forecasting by product, store, and date.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import (
