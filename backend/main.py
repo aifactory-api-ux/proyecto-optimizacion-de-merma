@@ -202,7 +202,6 @@ async def root():
 
 
 # Run validation check on startup
-@app.on_event("startup")
 async def validate_startup():
     """
     Validate required configuration on application startup.
