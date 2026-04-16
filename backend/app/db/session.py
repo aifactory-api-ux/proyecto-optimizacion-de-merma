@@ -261,9 +261,14 @@ async def init_db() -> None:
     Async initialization of database tables.
 
     Called on application startup via the lifespan context manager.
-    Tables already exist, skip creation.
     """
-    pass  # Tables already exist in database
+    from app.models.user import User
+    from app.models.waste import WasteRecord, WasteMetric, Product, Store
+    from app.models.alert import Alert
+    from app.models.demand import DemandPrediction
+
+    engine = db_manager.sync_engine
+    Base.metadata.create_all(bind=engine)
 
 
 async def close_db() -> None:
