@@ -381,16 +381,16 @@ class WasteRecordResponse(BaseModel):
         default=None,
         description="Additional notes"
     )
-    recorded_at: datetime = Field(
+    recorded_at: str = Field(
         ...,
         description="Timestamp when the waste occurred"
     )
-    created_at: datetime = Field(
-        ...,
+    created_at: Optional[str] = Field(
+        default=None,
         description="Timestamp when the record was created"
     )
-    updated_at: datetime = Field(
-        ...,
+    updated_at: Optional[str] = Field(
+        default=None,
         description="Timestamp when the record was last updated"
     )
 

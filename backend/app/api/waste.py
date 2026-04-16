@@ -124,7 +124,7 @@ def validate_date_range(start_date: str, end_date: str) -> tuple:
     return start_dt, end_dt
 
 
-@router.get("/by-product", response_model=WasteByProductResponse)
+@router.get("/by-product", response_model=List[WasteByProductResponse])
 def get_waste_by_product(
     start_date: str = Query(..., description="Start date in ISO 8601 format"),
     end_date: str = Query(..., description="End date in ISO 8601 format"),
