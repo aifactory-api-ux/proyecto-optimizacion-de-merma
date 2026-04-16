@@ -5,7 +5,7 @@ Pydantic models for waste-related API requests and responses.
 Provides request/response schemas for waste metrics, trends, and filtering.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -279,7 +279,7 @@ class CreateWasteRecordRequest(BaseModel):
         max_length=500
     )
     recorded_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc),
         description="Timestamp when the waste occurred"
     )
 

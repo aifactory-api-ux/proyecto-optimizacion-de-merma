@@ -92,11 +92,11 @@ class Alert(Base):
     
     def acknowledge(self) -> None:
         """Mark alert as acknowledged."""
-        self.acknowledged_at = datetime.utcnow()
+        self.acknowledged_at = datetime.now(timezone.utc)
     
     def resolve(self) -> None:
         """Mark alert as resolved."""
-        self.resolved_at = datetime.utcnow()
+        self.resolved_at = datetime.now(timezone.utc)
         self.is_active = 0
     
     def to_dict(self) -> dict:

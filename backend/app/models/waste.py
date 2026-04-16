@@ -58,8 +58,8 @@ class WasteRecord(Base):
     waste_reason = Column(String(100), nullable=True)
     notes = Column(Text, nullable=True)
     recorded_at = Column(DateTime, nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     product = relationship("Product", back_populates="waste_records")
@@ -110,8 +110,8 @@ class WasteMetric(Base):
     total_quantity_wasted = Column(Float, nullable=False, default=0.0)
     total_cost_wasted = Column(Float, nullable=False, default=0.0)
     record_count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     product = relationship("Product", back_populates="waste_metrics")
@@ -156,8 +156,8 @@ class Product(Base):
     sell_price = Column(Float, nullable=False, default=0.0)
     shelf_life_days = Column(Integer, nullable=True)
     is_active = Column(Integer, nullable=False, default=1)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     waste_records = relationship("WasteRecord", back_populates="product")
@@ -191,8 +191,8 @@ class Store(Base):
     address = Column(String(500), nullable=True)
     region = Column(String(100), nullable=True, index=True)
     is_active = Column(Integer, nullable=False, default=1)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     waste_records = relationship("WasteRecord", back_populates="store")

@@ -5,7 +5,7 @@ Common utility functions used across the backend application.
 Provides helpers for data formatting, validation, and common operations.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Union
 import json
 import logging
@@ -56,7 +56,7 @@ def calculate_date_range(
     Returns:
         Tuple of (start_date, end_date)
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if end_date is None:
         end_date = now
     if start_date is None:
@@ -444,7 +444,7 @@ def get_current_date() -> datetime:
     Returns:
         Current datetime (date only)
     """
-    return datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    return datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 def get_current_datetime() -> datetime:
@@ -453,7 +453,7 @@ def get_current_datetime() -> datetime:
     Returns:
         Current datetime
     """
-    return datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 
 def format_date(date: datetime, fmt: str = "%Y-%m-%d") -> str:

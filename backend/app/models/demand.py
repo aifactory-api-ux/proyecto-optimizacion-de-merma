@@ -57,7 +57,7 @@ class DemandPrediction(Base):
     confidence_level = Column(Float, nullable=True)
     model_version = Column(String(50), nullable=True)
     prediction_type = Column(String(50), nullable=False, default="daily")
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
     
     # Relationships
     product = relationship("Product", back_populates="demand_predictions")
