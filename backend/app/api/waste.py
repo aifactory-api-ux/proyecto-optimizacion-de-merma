@@ -327,7 +327,7 @@ def get_waste_summary(
     
     # Set default date range if not provided
     if not start_date or not end_date:
-        end_dt = datetime.utcnow()
+        end_dt = datetime.now(timezone.utc)
         start_dt = end_dt - timedelta(days=30)
         start_date = start_date or start_dt.isoformat()
         end_date = end_date or end_dt.isoformat()
@@ -439,7 +439,7 @@ def create_waste_record(
         cost_wasted=record.cost_wasted,
         waste_reason=record.waste_reason,
         notes=record.notes,
-        recorded_at=record.recorded_at or datetime.utcnow(),
+        recorded_at=record.recorded_at or datetime.now(timezone.utc),
     )
     
     db.add(waste_record)

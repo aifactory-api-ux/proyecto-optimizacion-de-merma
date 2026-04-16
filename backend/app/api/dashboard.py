@@ -6,7 +6,7 @@ alerts, and demand predictions.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Header, status
@@ -113,7 +113,7 @@ async def get_dashboard_metrics(
     """
     try:
         # Calculate date range
-        end_date = datetime.utcnow()
+        end_date = datetime.now(timezone.utc)
         start_date = end_date - timedelta(days=days)
         
         # Build base query filters

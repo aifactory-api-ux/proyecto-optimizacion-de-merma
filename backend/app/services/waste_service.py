@@ -7,7 +7,7 @@ and managing waste data.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlalchemy import and_, func
@@ -46,8 +46,8 @@ def get_waste_by_product(
         List of waste metrics grouped by product
     """
     # Parse dates with defaults
-    start_dt = parse_date(start_date) if start_date else datetime.utcnow()
-    end_dt = parse_date(end_date) if end_date else datetime.utcnow()
+    start_dt = parse_date(start_date) if start_date else datetime.now(timezone.utc)
+    end_dt = parse_date(end_date) if end_date else datetime.now(timezone.utc)
     
     # Build query filters
     filters = [
@@ -105,8 +105,8 @@ def get_waste_trend(
         List of waste metrics over time for the product
     """
     # Parse dates with defaults
-    start_dt = parse_date(start_date) if start_date else datetime.utcnow()
-    end_dt = parse_date(end_date) if end_date else datetime.utcnow()
+    start_dt = parse_date(start_date) if start_date else datetime.now(timezone.utc)
+    end_dt = parse_date(end_date) if end_date else datetime.now(timezone.utc)
     
     # Query waste metrics for the product
     results = (
@@ -166,8 +166,8 @@ def get_waste_summary(
         Aggregated waste summary
     """
     # Parse dates with defaults
-    start_dt = parse_date(start_date) if start_date else datetime.utcnow()
-    end_dt = parse_date(end_date) if end_date else datetime.utcnow()
+    start_dt = parse_date(start_date) if start_date else datetime.now(timezone.utc)
+    end_dt = parse_date(end_date) if end_date else datetime.now(timezone.utc)
     
     # Build filters
     filters = [
@@ -235,7 +235,7 @@ def create_waste_record(
         cost_wasted=data.cost_wasted,
         waste_reason=data.waste_reason,
         notes=data.notes,
-        recorded_at=parse_date(data.recorded_at) if data.recorded_at else datetime.utcnow(),
+        recorded_at=parse_date(data.recorded_at) if data.recorded_at else datetime.now(timezone.utc),
     )
     
     db.add(waste_record)
@@ -443,7 +443,7 @@ def calculate_waste_percentage(
     """
     from datetime import timedelta
     
-    end_date = datetime.utcnow()
+    end_date = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=days)
     
     filters = [
@@ -490,8 +490,8 @@ def get_top_waste_products(
     Returns:
         List of top waste products
     """
-    start_dt = parse_date(start_date) if start_date else datetime.utcnow()
-    end_dt = parse_date(end_date) if end_date else datetime.utcnow()
+    start_dt = parse_date(start_date) if start_date else datetime.now(timezone.utc)
+    end_dt = parse_date(end_date) if end_date else datetime.now(timezone.utc)
     
     results = (
         db.query(
@@ -543,8 +543,8 @@ def get_waste_by_store(
     Returns:
         List of waste metrics by store
     """
-    start_dt = parse_date(start_date) if start_date else datetime.utcnow()
-    end_dt = parse_date(end_date) if end_date else datetime.utcnow()
+    start_dt = parse_date(start_date) if start_date else datetime.now(timezone.utc)
+    end_dt = parse_date(end_date) if end_date else datetime.now(timezone.utc)
     
     results = (
         db.query(

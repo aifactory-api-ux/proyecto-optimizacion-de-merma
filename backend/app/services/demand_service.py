@@ -6,7 +6,7 @@ Implements prediction algorithms based on historical data patterns.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import func
@@ -453,7 +453,7 @@ class DemandService:
             Aggregated demand prediction or None
         """
         if target_date is None:
-            target_date = datetime.utcnow()
+            target_date = datetime.now(timezone.utc)
         
         # Get all predictions for the target date
         predictions = self.db.query(
@@ -478,7 +478,7 @@ class DemandService:
         Returns:
             Number of deleted records
         """
-        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
         
         deleted = self.db.query(DemandPrediction).filter(
             DemandPrediction.prediction_date < cutoff_date,
@@ -530,7 +530,7 @@ class DemandService:
         """
         from shared.constants import RecommendationType
 
-        today = datetime.utcnow()
+        today = datetime.now(timezone.utc)
         prediction = self.get_prediction(product_id, today, store_id)
 
         if prediction is None:

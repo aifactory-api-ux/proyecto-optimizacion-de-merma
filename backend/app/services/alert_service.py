@@ -6,7 +6,7 @@ Provides functions for retrieving, creating, updating, and managing alerts.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -194,7 +194,7 @@ class AlertService:
                 severity=severity,
                 alert_type=alert_type,
                 message=message,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
                 is_active=1
             )
             
@@ -228,7 +228,7 @@ class AlertService:
             if alert is None:
                 return None
             
-            alert.acknowledged_at = datetime.utcnow()
+            alert.acknowledged_at = datetime.now(timezone.utc)
             
             db.commit()
             db.refresh(alert)
@@ -259,7 +259,7 @@ class AlertService:
             if alert is None:
                 return None
             
-            alert.resolved_at = datetime.utcnow()
+            alert.resolved_at = datetime.now(timezone.utc)
             alert.is_active = 0
             
             db.commit()

@@ -7,7 +7,7 @@ to compile comprehensive dashboard metrics.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from sqlalchemy import func, and_, or_
@@ -65,7 +65,7 @@ class DashboardService:
         """
         try:
             # Calculate date range
-            end_date = datetime.utcnow()
+            end_date = datetime.now(timezone.utc)
             start_date = end_date - timedelta(days=days_back)
             
             # Build base filter conditions
@@ -298,7 +298,7 @@ class DashboardService:
             Latest predicted demand value or None
         """
         try:
-            filters = [DemandPrediction.prediction_date >= datetime.utcnow()]
+                filters = [DemandPrediction.prediction_date >= datetime.now(timezone.utc)]
             if store_id:
                 filters.append(DemandPrediction.store_id == store_id)
             
