@@ -268,7 +268,7 @@ async def init_db() -> None:
     from app.models.demand import DemandPrediction
 
     engine = db_manager.sync_engine
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine, checkfirst=True)
 
 
 async def close_db() -> None:
