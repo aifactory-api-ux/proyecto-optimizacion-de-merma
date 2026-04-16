@@ -27,9 +27,3 @@ root.render(
     <App />
   </React.StrictMode>
 );
-
-export default function main() {
-  // The main function serves as the application entry point
-  // ReactDOM.createRoot handles the rendering lifecycle
-  console.log('Merma Optimization App initialized');
-}

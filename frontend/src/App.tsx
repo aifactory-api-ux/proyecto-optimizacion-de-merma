@@ -1,177 +1,13 @@
-import React, { useState, useEffect, createContext, useContext, ReactNode, Component } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './styles/theme';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
+import { AuthProvider, useAuthContext } from './contexts/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import ProtectedRoute from './components/ProtectedRoute';
 
-// Auth Context Type
-interface AuthContextType {
-  isAuthenticated: boolean;
-  token: string | null;
-  user: { id: number; username: string; is_admin: boolean } | null;
-  login: (token: string, user: { id: number; username: string; is_admin: boolean }) => void;
-  logout: () => void;
-  isLoading: boolean;
-}
-
-// Create Auth Context
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Auth Provider Component
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: number; username: string; is_admin: boolean } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check for stored token on mount
-    const storedToken = localStorage.getItem('access_token');
-    const storedUser = localStorage.getItem('auth_user_data');
-    
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsedUser);
-      } catch (e) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('auth_user_data');
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  const login = (newToken: string, newUser: { id: number; username: string; is_admin: boolean }) => {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem('access_token', newToken);
-    localStorage.setItem('auth_user_data', JSON.stringify(newUser));
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('auth_user_data');
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated: !!token,
-        token,
-        user,
-        login,
-        logout,
-        isLoading
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-// Custom hook to use auth context
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
-  }
-  return context;
-};
-
-// Error Boundary Component
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    console.error('ErrorBoundary: getDerivedStateFromError', error);
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('ErrorBoundary: componentDidCatch', error, errorInfo);
-  }
-
-  render(): React.ReactNode {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '20px',
-          textAlign: 'center'
-        }}>
-          <h1>Something went wrong</h1>
-          <p style={{ color: '#666' }}>{this.state.error?.message || 'An unexpected error occurred'}</p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: '16px',
-              padding: '10px 20px',
-              background: '#1976d2',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Reload Page
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-// Protected Route Component
-interface ProtectedRouteProps {
-  children: React.ReactElement;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuthContext();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh'
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return children;
-};
-
-// Main App Routes Component
 const AppRoutes: React.FC = () => {
   const { logout, user } = useAuthContext();
   const navigate = useNavigate();
@@ -198,7 +34,6 @@ const AppRoutes: React.FC = () => {
   );
 };
 
-// Main App Component
 const App: React.FC = () => {
   return (
     <ErrorBoundary>

@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
-import { useAuthContext } from '../App';
+import { useAuthContext } from '../contexts/AuthContext';
 
 export default function LoginForm() {
   const navigate = useNavigate();
