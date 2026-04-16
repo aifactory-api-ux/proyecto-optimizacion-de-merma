@@ -6,7 +6,7 @@ Implements time series queries, waste by product, and trend analysis.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -27,7 +27,6 @@ from app.schemas.waste import (
     UpdateWasteRecordRequest,
     WasteRecordResponse,
 )
-from app.models.waste import WasteRecord, Product, Store
 
 logger = logging.getLogger(__name__)
 
@@ -329,7 +328,7 @@ def get_waste_summary(
     # Set default date range if not provided
     if not start_date or not end_date:
         end_dt = datetime.utcnow()
-        start_dt = datetime(end_dt.year, end_dt.month, end_dt.day - 30)
+        start_dt = end_dt - timedelta(days=30)
         start_date = start_date or start_dt.isoformat()
         end_date = end_date or end_dt.isoformat()
     else:
